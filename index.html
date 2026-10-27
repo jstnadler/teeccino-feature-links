@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Teeccino Shop All Feature Link Generator</title>
+<style>
+  :root { --brown:#5B3A29; --ink:#222; --muted:#666; --line:#ddd; --bg:#faf7f3; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:760px; margin:32px auto; padding:28px; background:#fff; border:1px solid var(--line); border-radius:10px; }
+  h1 { margin:0 0 4px; font-size:22px; color:var(--brown); }
+  .sub { margin:0 0 24px; color:var(--muted); font-size:14px; }
+  label { display:block; font-weight:600; font-size:14px; margin:16px 0 6px; }
+  .opt { font-weight:400; color:var(--muted); }
+  select, input { width:100%; padding:9px 10px; font:inherit; border:1px solid #bbb; border-radius:6px; background:#fff; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:0 16px; }
+  fieldset { border:1px solid var(--line); border-radius:8px; margin:22px 0 0; padding:4px 16px 16px; }
+  legend { font-weight:600; font-size:14px; padding:0 6px; }
+  .type { color:var(--muted); font-size:13px; margin-top:6px; min-height:1em; }
+  .out { margin-top:24px; }
+  textarea { width:100%; min-height:84px; padding:10px; font:14px/1.4 ui-monospace,Consolas,monospace; border:1px solid #bbb; border-radius:6px; resize:vertical; word-break:break-all; }
+  .row { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+  button, a.btn { padding:9px 16px; font:inherit; font-weight:600; border-radius:6px; border:1px solid var(--brown); cursor:pointer; text-decoration:none; }
+  button.primary { background:var(--brown); color:#fff; }
+  button.secondary, a.btn { background:#fff; color:var(--brown); }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  .msg { font-size:13px; color:#2e7d32; min-height:1em; margin-top:6px; }
+  .hint { font-size:12px; color:var(--muted); margin-top:4px; }
+  @media (max-width:560px){ .grid { grid-template-columns:1fr; } main { margin:0; border-radius:0; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Shop All feature link generator</h1>
+  <p class="sub">Pick a product to get a link that opens Teeccino's Shop All page with that product featured at the top. Tracking fields are optional.</p>
+
+  <label for="product">Product</label>
+  <select id="product"><option value="">Choose a product…</option></select>
+  <div class="type" id="ptype"></div>
+
+  <fieldset>
+    <legend>Tracking (optional)</legend>
+    <div class="grid">
+      <div><label for="utm_source">Source <span class="opt">utm_source</span></label><input id="utm_source" placeholder="e.g. meta"></div>
+      <div><label for="utm_medium">Medium <span class="opt">utm_medium</span></label><input id="utm_medium" placeholder="e.g. paid_social"></div>
+      <div><label for="utm_campaign">Campaign <span class="opt">utm_campaign</span></label><input id="utm_campaign" placeholder="e.g. fall_2026"></div>
+      <div><label for="utm_content">Content <span class="opt">utm_content</span></label><input id="utm_content" placeholder="e.g. video_a"></div>
+    </div>
+    <div class="hint">Leave any field blank to leave it out. Lowercase with underscores keeps reports tidy; spaces and symbols are encoded for you.</div>
+  </fieldset>
+
+  <div class="out">
+    <label for="result">Your link</label>
+    <textarea id="result" readonly placeholder="Choose a product to build the link."></textarea>
+    <div class="row">
+      <button class="primary" id="copy" disabled>Copy link</button>
+      <a class="btn" id="open" href="#" target="_blank" rel="noopener" aria-disabled="true">Open to check</a>
+      <button class="secondary" id="reset">Clear</button>
+    </div>
+    <div class="msg" id="msg" role="status"></div>
+  </div>
+  <p class="hint" style="margin-top:28px">Need every link at once? <a href="teeccino-feature-links.csv" download rel="nofollow">Download the full list (CSV)</a></p>
+</main>
+<script>
+const PRODUCTS = [
+ {
+  "label": "French Roast - Herbal Coffee - 11 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=french-roast-herbal-coffee"
+ },
+ {
+  "label": "Hazelnut - Herbal Coffee - 11 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=hazelnut-herbal-coffee"
+ },
+ {
+  "label": "Dandelion Dark Roast - Herbal Coffee - 10 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=dandelion-dark-roast-herbal-coffee"
+ },
+ {
+  "label": "Dark Chocolate - Herbal Coffee - 10 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=dark-chocolate-prebiotic-superboost-herbal-coffee"
+ },
+ {
+  "label": "Adapt & Protect - Herbal Coffee - 10 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=miraculous-mushrooms-herbal-coffee"
+ },
+ {
+  "label": "Pumpkin Spice - Herbal Coffee - 11 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=pumpkin-herbal-coffee"
+ },
+ {
+  "label": "Vanilla Nut - Herbal Coffee - 11 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=vanilla-nut-herbal-coffee"
+ },
+ {
+  "label": "Dandelion Caramel Nut - Herbal Coffee - 10 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=dandelion-caramel-nut-herbal-coffee"
+ },
+ {
+  "label": "Dark Chocolate Prebiotic SuperBoost - Herbal Tea - 25 ct",
+  "type": "Herbal Tea",
+  "link": "https://teeccino.com/collections/all?feature=dark-chocolate-prebiotic-superboost-herbal-tea"
+ },
+ {
+  "label": "Java - Herbal Coffee - 11 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=java-herbal-coffee"
+ },
+ {
+  "label": "Mocha - Herbal Coffee - 11 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=mocha-herbal-coffee"
+ },
+ {
+  "label": "Chaga Ashwagandha Butterscotch Cream - Herbal Coffee - 10 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=chaga-ashwangandha-mushroom-herbal-coffee"
+ },
+ {
+  "label": "Almond Amaretto - Herbal Coffee - 11 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=almond-amaretto-herbal-coffee"
+ },
+ {
+  "label": "Dandelion Dark Roast - Herbal Tea - 25 ct",
+  "type": "Herbal Tea",
+  "link": "https://teeccino.com/collections/all?feature=dandelion-dark-roast-herbal-tea"
+ },
+ {
+  "label": "Dandelion Caramel Nut - Herbal Tea - 25 ct",
+  "type": "Herbal Tea",
+  "link": "https://teeccino.com/collections/all?feature=dandelion-caramel-nut-herbal-tea"
+ },
+ {
+  "label": "Maple Pecan - Herbal Coffee - 11 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=maple-pecan-herbal-coffee"
+ },
+ {
+  "label": "Turkey Tail Astragalus Toasted Maple - Herbal Coffee - 10 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=turkey-tail-astragalus-mushroom-herbal-coffee"
+ },
+ {
+  "label": "Cacao + 5 - Instant Herbal Coffee - 4.76 oz",
+  "type": "Instant Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=instant-miraculous-mushrooms-cacao-5"
+ },
+ {
+  "label": "Classic - Herbal Coffee - Sampler (APG)",
+  "type": "Sampler / Trial",
+  "link": "https://teeccino.com/collections/all?feature=herbal-coffee-sampler-trial-pack"
+ },
+ {
+  "label": "French Roast - Herbal Tea - 25 ct",
+  "type": "Herbal Tea",
+  "link": "https://teeccino.com/collections/all?feature=french-roast-herbal-tea"
+ },
+ {
+  "label": "Reishi Eleuthero French Roast Mushroom - Herbal Coffee - 10 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=reishi-eleuthero-mushroom-herbal-coffee"
+ },
+ {
+  "label": "Pumpkin Spice - Herbal Tea - 25 ct",
+  "type": "Herbal Tea",
+  "link": "https://teeccino.com/collections/all?feature=pumpkin-herbal-tea"
+ },
+ {
+  "label": "Vanilla Nut - Herbal Tea - 25 ct",
+  "type": "Herbal Tea",
+  "link": "https://teeccino.com/collections/all?feature=vanilla-nut-herbal-tea"
+ },
+ {
+  "label": "Maca Chocolate - Herbal Coffee - 11 oz (APG)",
+  "type": "Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=maca-chocolate-herbal-coffee"
+ },
+ {
+  "label": "Adapt & Protect - Instant Herbal Coffee - 3.95 oz",
+  "type": "Instant Herbal Coffee",
+  "link": "https://teeccino.com/collections/all?feature=instant-miraculous-mushrooms-herbal-coffee"
+ },
+ {
+  "label": "Matcha Latte - Instant Herbal Latte - 8.9 oz",
+  "type": "Instant Herbal Latte",
+  "link": "https://teeccino.com/collections/all?feature=miraculous-mushrooms%C2%AE-matcha-instant-latte"
+ }
+];
+const UTM = ["utm_source", "utm_medium", "utm_campaign", "utm_content"];
+const $ = id => document.getElementById(id);
+const sel = $("product");
+PRODUCTS.forEach((p, i) => { const o = document.createElement("option"); o.value = i; o.textContent = p.label; sel.appendChild(o); });
+
+function build() {
+  $("msg").textContent = "";
+  const p = PRODUCTS[sel.value];
+  $("ptype").textContent = p ? p.type : "";
+  if (!p) { $("result").value = ""; $("copy").disabled = true; $("open").href = "#"; return; }
+  // Base link already carries ?feature=<encoded handle>; append each non-empty UTM with &.
+  let url = p.link;
+  for (const k of UTM) {
+    const v = $(k).value.trim();
+    if (v) url += "&" + k + "=" + encodeURIComponent(v);
+  }
+  $("result").value = url; $("copy").disabled = false; $("open").href = url;
+}
+sel.addEventListener("change", build);
+UTM.forEach(k => $(k).addEventListener("input", build));
+$("copy").addEventListener("click", async () => {
+  const t = $("result").value; if (!t) return;
+  try { await navigator.clipboard.writeText(t); } catch (e) { $("result").select(); document.execCommand("copy"); }
+  $("msg").textContent = "Copied.";
+});
+$("reset").addEventListener("click", () => { sel.value = ""; UTM.forEach(k => $(k).value = ""); build(); });
+</script>
+</body>
+</html>
